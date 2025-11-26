@@ -7,7 +7,7 @@ import LandingPage from './components/LandingPage';
 import { OnboardingForm } from './components/OnboardingForm';
 import { AppView, User } from './types';
 import { getUserProfile } from './services/userProfileService';
-import { generateSessionToken, setSessionToken, setUserProfileId, getUserProfileId, clearSession } from './utils/sessionUtils';
+import { generateSessionToken, setSessionToken, setUserProfileId as saveUserProfileId, getUserProfileId, clearSession } from './utils/sessionUtils';
 import { Settings as SettingsIcon } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -61,9 +61,10 @@ const App: React.FC = () => {
   };
 
   const handleOnboardingComplete = (profileId: string) => {
+    console.log('[App] Onboarding complete, saving profile ID:', profileId);
     const sessionToken = generateSessionToken();
     setSessionToken(sessionToken);
-    setUserProfileId(profileId);
+    saveUserProfileId(profileId);
     setUserProfileId(profileId);
     loadUserProfile(profileId);
   };

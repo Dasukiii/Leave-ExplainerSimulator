@@ -77,12 +77,13 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
       if (uploadedFile) {
         try {
           setIsExtractingPDF(true);
-          console.log('Starting PDF extraction...');
+          console.log('[OnboardingForm] Starting PDF extraction...');
           const extractedPolicies = await extractPoliciesFromPDF(uploadedFile);
-          console.log(`Successfully extracted ${extractedPolicies.length} policies`);
+          console.log(`[OnboardingForm] Successfully extracted ${extractedPolicies.length} policies`);
 
           if (extractedPolicies.length > 0) {
-            console.log('Deleting user-specific policies and saving new ones...');
+            console.log('[OnboardingForm] Deleting user-specific policies and saving new ones...');
+            console.log('[OnboardingForm] User profile ID:', profile.id);
             await deleteUserPolicies(profile.id);
             const newPolicies = extractedPolicies.map(p => ({
               title: p.title,
@@ -91,13 +92,14 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
               source_url: null,
               user_profile_id: profile.id
             }));
-            await createMultiplePolicies(newPolicies);
-            console.log('Policies saved successfully');
+            console.log('[OnboardingForm] Saving policies with user_profile_id:', profile.id);
+            const savedPolicies = await createMultiplePolicies(newPolicies);
+            console.log('[OnboardingForm] Policies saved successfully:', savedPolicies.length);
           }
           setIsExtractingPDF(false);
         } catch (pdfError) {
           setIsExtractingPDF(false);
-          console.error('Error processing PDF:', pdfError);
+          console.error('[OnboardingForm] Error processing PDF:', pdfError);
         }
       }
 

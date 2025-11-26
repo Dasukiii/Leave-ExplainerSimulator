@@ -17,12 +17,15 @@ export const PolicyLibrary: React.FC = () => {
   const userProfileId = getUserProfileId();
 
   useEffect(() => {
+    console.log('[PolicyLibrary] User Profile ID from localStorage:', userProfileId);
     loadPolicies();
   }, []);
 
   const loadPolicies = async () => {
     try {
+      console.log('[PolicyLibrary] Loading policies for user:', userProfileId);
       const data = await getAllPolicies(userProfileId || undefined);
+      console.log('[PolicyLibrary] Loaded policies:', data.length, 'policies');
       setPolicies(data);
     } catch (error) {
       console.error('Error loading policies:', error);

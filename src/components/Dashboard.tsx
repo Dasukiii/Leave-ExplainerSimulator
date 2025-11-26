@@ -26,9 +26,21 @@ interface DashboardProps {
   userEmail: string;
   userRole: string;
   onLogout: () => void;
+  /**
+   * NEW: when true, Dashboard will remount charts to replay animations.
+   * Parent should pass `isActive={currentView === AppView.PROFILE}` (or equivalent).
+   */
+  isActive?: boolean;
 }
 
-export default function Dashboard({ userId, userName, userEmail, userRole, onLogout }: DashboardProps) {
+export default function Dashboard({
+  userId,
+  userName,
+  userEmail,
+  userRole,
+  onLogout,
+  isActive = false,
+}: DashboardProps) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -43,28 +55,16 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
   // reloadKey forces chart remount when changed
   const [reloadKey, setReloadKey] = useState<number>(() => Date.now());
 
+  // Only trigger chart remount when navigating inside the app:
   useEffect(() => {
-    // set new key on initial mount (ensures charts animate on first view)
-    setReloadKey(Date.now());
-
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        // user returned to tab — nudge reloadKey to remount charts
-        setReloadKey(Date.now());
-      }
-    };
-
-    // window focus is useful for some environments (switching tabs/windows)
-    const onWindowFocus = () => setReloadKey(Date.now());
-
-    document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('focus', onWindowFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('focus', onWindowFocus);
-    };
-  }, []);
+    if (isActive) {
+      // small delay so any mounting UI settles — optional, but smoother
+      const t = window.setTimeout(() => setReloadKey(Date.now()), 40);
+      return () => clearTimeout(t);
+    }
+    // if not active we do nothing (no chart remount)
+    return;
+  }, [isActive]);
 
   useEffect(() => {
     loadUserProfile();
@@ -153,20 +153,20 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
     { name: 'Remaining', value: Math.max(0, annualLeaveRemaining) },
   ];
   // green palette
-  const COLORS = ['#334155', '#10b981'];
+  const COLORS = ['#065f46', '#10b981'];
 
   const barData = [
     {
       name: 'Annual',
       total: annualLeaveTotal,
       used: annualLeaveUsed,
-      remaining: annualLeaveRemaining
+      remaining: annualLeaveRemaining,
     },
     {
       name: 'Sick',
       total: sickLeaveTotal,
       used: sickLeaveUsed,
-      remaining: sickLeaveRemaining
+      remaining: sickLeaveRemaining,
     },
   ];
 
@@ -389,8 +389,8 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
                   cursor={{ fill: 'transparent' }}
                   contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#e2e8f0' }}
                 />
-                <Bar dataKey="used" stackId="a" fill="#334155" radius={[6, 0, 0, 6]} isAnimationActive={true} animationDuration={800}/>
-                <Bar dataKey="remaining" stackId="a" fill="#3b82f6" radius={[0, 6, 6, 0]} isAnimationActive={true} animationDuration={800}/>
+                <Bar dataKey="used" stackId="a" fill="#065f46" radius={[6, 0, 0, 6]} isAnimationActive={true} animationDuration={800} />
+                <Bar dataKey="remaining" stackId="a" fill="#10b981" radius={[0, 6, 6, 0]} isAnimationActive={true} animationDuration={800} />
               </BarChart>
             </ResponsiveContainer>
           </div>

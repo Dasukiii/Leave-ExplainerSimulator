@@ -102,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
         onConfirm={handleConfirmLogout}
         title="Confirm Logout"
         message="You may lose your session data if you quit now, are you sure?"
-        confirmText="Confirm Logout"
+        confirmText="Logout"
         cancelText="Cancel"
         variant="danger"
       />

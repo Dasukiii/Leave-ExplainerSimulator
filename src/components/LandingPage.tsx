@@ -1,15 +1,39 @@
-import React from 'react';
-import { ArrowRight, MessageSquare, CheckCircle, PieChart } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight, MessageSquare, CheckCircle, PieChart, Loader2 } from 'lucide-react';
 
 interface LandingPageProps {
   onGetStarted: () => void;
+  onAutoLogin?: (profileId: string) => void;
 }
 
 /**
  * Replaces Dashboard.tsx with a landing/hero style component.
  * Exported as default so it can safely replace the original Dashboard file.
  */
-export default function LandingPage({ onGetStarted }: LandingPageProps) {
+export default function LandingPage({ onGetStarted, onAutoLogin }: LandingPageProps) {
+  const [isCheckingSession, setIsCheckingSession] = useState(false);
+
+  const handleGetStarted = async () => {
+    setIsCheckingSession(true);
+
+    try {
+      const storedProfileId = localStorage.getItem('userProfileId');
+
+      if (storedProfileId && onAutoLogin) {
+        console.log('[LandingPage] Found existing session, attempting auto-login');
+        await onAutoLogin(storedProfileId);
+      } else {
+        console.log('[LandingPage] No existing session, proceeding to onboarding');
+        onGetStarted();
+      }
+    } catch (error) {
+      console.error('[LandingPage] Error checking session:', error);
+      onGetStarted();
+    } finally {
+      setIsCheckingSession(false);
+    }
+  };
+
   return (
     <div className="w-screen h-screen bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden">
       {/* Background Gradients */}
@@ -32,12 +56,22 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
           No HR waiting. Get instant policy citations, check personalized eligibility, and simulate your leave balances in seconds.
         </p>
 
-        <button 
-          onClick={onGetStarted}
-          className="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full text-lg transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 mx-auto"
+        <button
+          onClick={handleGetStarted}
+          disabled={isCheckingSession}
+          className="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full text-lg transition-all shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Get Started
-          <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+          {isCheckingSession ? (
+            <>
+              <Loader2 className="animate-spin" />
+              Checking session...
+            </>
+          ) : (
+            <>
+              Get Started
+              <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            </>
+          )}
         </button>
 
         {/* Features Grid */}

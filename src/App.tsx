@@ -8,6 +8,7 @@ import { OnboardingForm } from './components/OnboardingForm';
 import { AppView, User } from './types';
 import { getUserProfile } from './services/userProfileService';
 import { generateSessionToken, setSessionToken, setUserProfileId as saveUserProfileId, getUserProfileId, clearSession } from './utils/sessionUtils';
+import { validateSession } from './services/sessionValidationService';
 import { Settings as SettingsIcon } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -17,15 +18,10 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<AppView>(AppView.CHAT);
   const [isLoading, setIsLoading] = useState(true);
+  const [welcomeMessage, setWelcomeMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedProfileId = getUserProfileId();
-    if (storedProfileId) {
-      setUserProfileId(storedProfileId);
-      loadUserProfile(storedProfileId);
-    } else {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
   }, []);
 
   const loadUserProfile = async (profileId: string) => {
@@ -60,6 +56,30 @@ const App: React.FC = () => {
     }
   };
 
+  const handleAutoLogin = async (profileId: string) => {
+    try {
+      console.log('[App] Attempting auto-login with profile:', profileId);
+      const validation = await validateSession(profileId);
+
+      if (validation.isValid) {
+        console.log('[App] Session valid, loading profile');
+        await loadUserProfile(profileId);
+        setWelcomeMessage(`Welcome back!`);
+        setTimeout(() => setWelcomeMessage(null), 3000);
+      } else {
+        console.log('[App] Session invalid, clearing and showing onboarding');
+        clearSession();
+        setHasStarted(true);
+        setHasOnboarded(false);
+      }
+    } catch (error) {
+      console.error('[App] Auto-login error:', error);
+      clearSession();
+      setHasStarted(true);
+      setHasOnboarded(false);
+    }
+  };
+
   const handleOnboardingComplete = (profileId: string) => {
     console.log('[App] Onboarding complete, saving profile ID:', profileId);
     const sessionToken = generateSessionToken();
@@ -78,7 +98,12 @@ const App: React.FC = () => {
   }
 
   if (!hasStarted) {
-    return <LandingPage onGetStarted={() => setHasStarted(true)} />;
+    return (
+      <LandingPage
+        onGetStarted={() => setHasStarted(true)}
+        onAutoLogin={handleAutoLogin}
+      />
+    );
   }
 
   if (!hasOnboarded) {
@@ -138,6 +163,12 @@ const App: React.FC = () => {
       <main className="flex-1 ml-64 relative z-10 h-full">
         {renderContent()}
       </main>
+
+      {welcomeMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 border border-slate-700 rounded-lg px-6 py-3 shadow-2xl animate-fade-in">
+          <p className="text-sm text-slate-200">{welcomeMessage}</p>
+        </div>
+      )}
     </div>
   );
 };

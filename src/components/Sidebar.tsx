@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppView, User as UserType } from '../types';
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  BookOpen, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  MessageSquare,
+  BookOpen,
+  Settings,
+  LogOut,
   User,
   Sparkles
 } from 'lucide-react';
+import { ConfirmationModal } from './ConfirmationModal';
 
 interface SidebarProps {
   currentView: AppView;
@@ -18,7 +19,18 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, user, onLogout }) => {
-  
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
+  };
+
   const NavItem = ({ view, icon: Icon, label }: { view: AppView; icon: any; label: string }) => {
     const isActive = currentView === view;
     return (
@@ -74,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
           </div>
           {onLogout && (
             <button
-              onClick={onLogout}
+              onClick={handleLogoutClick}
               className="text-slate-500 hover:text-red-400 transition-colors"
               title="Logout"
             >
@@ -83,6 +95,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
           )}
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        title="Confirm Logout"
+        message="You may lose your session data if you quit now, are you sure?"
+        confirmText="Confirm Logout"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 };

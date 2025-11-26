@@ -153,7 +153,7 @@ export default function Dashboard({
     { name: 'Remaining', value: Math.max(0, annualLeaveRemaining) },
   ];
   // green palette
-  const COLORS = ['#065f46', '#10b981'];
+  const COLORS = ['#334155', '#10b981'];
 
   const barData = [
     {

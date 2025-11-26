@@ -10,15 +10,6 @@ export interface Policy {
   updated_at: string;
 }
 
-export interface PolicyChunk {
-  id: string;
-  policy_id: string;
-  chunk_index: number;
-  chunk_text: string;
-  chunk_tokens: number;
-  created_at: string;
-}
-
 export const getAllPolicies = async (userProfileId?: string): Promise<Policy[]> => {
   console.log('[getAllPolicies] Called with userProfileId:', userProfileId);
 

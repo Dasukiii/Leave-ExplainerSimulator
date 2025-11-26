@@ -40,8 +40,35 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
     sick_balance: 0,
   });
 
+  // reloadKey forces chart remount when changed
+  const [reloadKey, setReloadKey] = useState<number>(() => Date.now());
+
+  useEffect(() => {
+    // set new key on initial mount (ensures charts animate on first view)
+    setReloadKey(Date.now());
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        // user returned to tab — nudge reloadKey to remount charts
+        setReloadKey(Date.now());
+      }
+    };
+
+    // window focus is useful for some environments (switching tabs/windows)
+    const onWindowFocus = () => setReloadKey(Date.now());
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('focus', onWindowFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('focus', onWindowFocus);
+    };
+  }, []);
+
   useEffect(() => {
     loadUserProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const loadUserProfile = async () => {
@@ -125,8 +152,8 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
     { name: 'Used', value: Math.max(0, annualLeaveUsed) },
     { name: 'Remaining', value: Math.max(0, annualLeaveRemaining) },
   ];
-  // switched to green palette
-  const COLORS = ['#334155', '#10b981'];
+  // green palette
+  const COLORS = ['#065f46', '#10b981'];
 
   const barData = [
     {
@@ -152,7 +179,7 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
             <p className="text-slate-400">View and manage your leave details</p>
           </div>
 
-          {/* Export Summary removed as requested */}
+          {/* Export Summary removed intentionally */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -287,7 +314,7 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
 
               {/* lifted the pie a bit (reduced top margin) and centered vertically by changing cy */}
               <div className="h-36 w-full mt-2 flex items-center">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer key={`pie-${reloadKey}`} width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={pieData}
@@ -300,6 +327,8 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
                       paddingAngle={5}
                       dataKey="value"
                       stroke="none"
+                      isAnimationActive={true}
+                      animationDuration={800}
                     >
                       {pieData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -352,7 +381,7 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
           </div>
 
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer key={`bar-${reloadKey}`} width="100%" height="100%">
               <BarChart data={barData} layout="vertical" barSize={18}>
                 <XAxis type="number" hide />
                 <YAxis dataKey="name" type="category" stroke="#64748b" width={80} tick={{ fontSize: 12 }} />
@@ -360,8 +389,8 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
                   cursor={{ fill: 'transparent' }}
                   contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#e2e8f0' }}
                 />
-                <Bar dataKey="used" stackId="a" fill="#334155" radius={[6, 0, 0, 6]} />
-                <Bar dataKey="remaining" stackId="a" fill="#3b82f6" radius={[0, 6, 6, 0]} />
+                <Bar dataKey="used" stackId="a" fill="#334155" radius={[6, 0, 0, 6]} isAnimationActive={true} animationDuration={800}/>
+                <Bar dataKey="remaining" stackId="a" fill="#3b82f6" radius={[0, 6, 6, 0]} isAnimationActive={true} animationDuration={800}/>
               </BarChart>
             </ResponsiveContainer>
           </div>

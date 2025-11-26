@@ -38,7 +38,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
     setIsLoading(true);
 
     try {
-      const policies = await getAllPolicies();
+      const policies = await getAllPolicies(user.id);
       const policyContext = policies.map(p => `${p.title} (${p.category}): ${p.text_doc}`).join('\n\n');
 
       const responseText = await sendMessageToOpenAI(messages, input, user, policyContext);

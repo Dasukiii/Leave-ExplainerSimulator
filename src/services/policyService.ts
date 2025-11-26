@@ -20,7 +20,10 @@ export interface PolicyChunk {
 }
 
 export const getAllPolicies = async (userProfileId?: string): Promise<Policy[]> => {
+  console.log('[getAllPolicies] Called with userProfileId:', userProfileId);
+
   if (!userProfileId) {
+    console.log('[getAllPolicies] No user profile ID, fetching default policies');
     const { data, error } = await supabase
       .from('policies')
       .select('*')
@@ -28,9 +31,11 @@ export const getAllPolicies = async (userProfileId?: string): Promise<Policy[]> 
       .order('category', { ascending: true });
 
     if (error) throw error;
+    console.log('[getAllPolicies] Returning default policies:', data?.length || 0);
     return data || [];
   }
 
+  console.log('[getAllPolicies] Fetching user-specific policies for:', userProfileId);
   const { data: userPolicies, error: userError } = await supabase
     .from('policies')
     .select('*')
@@ -39,10 +44,14 @@ export const getAllPolicies = async (userProfileId?: string): Promise<Policy[]> 
 
   if (userError) throw userError;
 
+  console.log('[getAllPolicies] User-specific policies found:', userPolicies?.length || 0);
+
   if (userPolicies && userPolicies.length > 0) {
+    console.log('[getAllPolicies] Returning user-specific policies');
     return userPolicies;
   }
 
+  console.log('[getAllPolicies] No user policies found, falling back to defaults');
   const { data: defaultPolicies, error: defaultError } = await supabase
     .from('policies')
     .select('*')
@@ -50,6 +59,7 @@ export const getAllPolicies = async (userProfileId?: string): Promise<Policy[]> 
     .order('category', { ascending: true });
 
   if (defaultError) throw defaultError;
+  console.log('[getAllPolicies] Returning default policies:', defaultPolicies?.length || 0);
   return defaultPolicies || [];
 };
 

@@ -138,6 +138,7 @@ const App: React.FC = () => {
             userEmail={user.email}
             userRole={user.role}
             onLogout={handleLogout}
+            isActive={currentView === AppView.PROFILE} // <-- added prop so Dashboard can replay charts
           />
         );
       case AppView.POLICIES:

@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Message, User } from '../types';
 import { sendMessageToOpenAI } from '../services/openaiClient';
 import { getAllPolicies } from '../services/policyService';
-import { Send, Bot, User as UserIcon, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
+import { getOrCreateChatSession, updateChatSession, ChatSession } from '../services/chatSessionService';
+import { Send, Bot, User as UserIcon, Sparkles, AlertCircle, RefreshCw, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface ChatInterfaceProps {
@@ -13,6 +14,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -22,6 +25,33 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    loadChatSession();
+  }, [user.id]);
+
+  const loadChatSession = async () => {
+    try {
+      console.log('[ChatInterface] Loading chat session for user:', user.id);
+      const session = await getOrCreateChatSession(user.id);
+      setSessionId(session.id);
+      setMessages(session.messages || []);
+      console.log('[ChatInterface] Loaded', session.messages?.length || 0, 'messages');
+    } catch (error) {
+      console.error('[ChatInterface] Error loading chat session:', error);
+    } finally {
+      setIsLoadingSession(false);
+    }
+  };
+
+  const saveChatSession = async (updatedMessages: Message[]) => {
+    if (!sessionId) return;
+    try {
+      await updateChatSession(sessionId, updatedMessages);
+    } catch (error) {
+      console.error('[ChatInterface] Error saving chat session:', error);
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -33,7 +63,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setInput('');
     setIsLoading(true);
 
@@ -50,7 +81,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, aiMsg]);
+      const finalMessages = [...newMessages, aiMsg];
+      setMessages(finalMessages);
+      await saveChatSession(finalMessages);
     } catch (error) {
       console.error(error);
     } finally {
@@ -65,9 +98,46 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
     "Can I carry over unused leave?"
   ];
 
+  const exportToPDF = () => {
+    const content = messages.map(msg => {
+      const role = msg.role === 'user' ? 'You' : 'AI Assistant';
+      const time = new Date(msg.timestamp).toLocaleString();
+      return `${role} (${time}):\n${msg.text}\n\n`;
+    }).join('---\n\n');
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `chat-history-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  if (isLoadingSession) {
+    return (
+      <div className="h-full flex items-center justify-center bg-slate-950">
+        <div className="text-slate-400">Loading chat session...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full flex flex-col relative overflow-hidden bg-slate-950">
-        
+      {messages.length > 0 && (
+        <div className="absolute top-4 right-6 z-30">
+          <button
+            onClick={exportToPDF}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded-lg transition-all shadow-lg"
+          >
+            <Download size={16} />
+            <span className="text-sm">Export Chat</span>
+          </button>
+        </div>
+      )}
+
       {/* Ambient Background Effects */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-600/10 blur-[100px] rounded-full pointer-events-none" />
       

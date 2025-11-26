@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Calendar,
   Award,
-  Download,
   Clock as ClockIcon,
   Edit2,
   Save,
@@ -126,7 +125,8 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
     { name: 'Used', value: Math.max(0, annualLeaveUsed) },
     { name: 'Remaining', value: Math.max(0, annualLeaveRemaining) },
   ];
-  const COLORS = ['#334155', '#3b82f6'];
+  // switched to green palette
+  const COLORS = ['#065f46', '#10b981'];
 
   const barData = [
     {
@@ -152,10 +152,7 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
             <p className="text-slate-400">View and manage your leave details</p>
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 hover:text-white hover:border-slate-600 transition-all">
-            <Download size={16} />
-            <span>Export Summary</span>
-          </button>
+          {/* Export Summary removed as requested */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -288,17 +285,18 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
                 </div>
               </div>
 
-              <div className="h-32 w-full mt-4">
+              {/* lifted the pie a bit (reduced top margin) and centered vertically by changing cy */}
+              <div className="h-36 w-full mt-2 flex items-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={pieData}
                       cx="50%"
-                      cy="100%"
+                      cy="55%"
                       startAngle={180}
                       endAngle={0}
-                      innerRadius={60}
-                      outerRadius={80}
+                      innerRadius={48}
+                      outerRadius={72}
                       paddingAngle={5}
                       dataKey="value"
                       stroke="none"
@@ -309,10 +307,11 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="flex justify-between text-xs text-slate-500 -mt-6 px-8">
-                  <span>Used ({annualLeaveUsed})</span>
-                  <span>Total ({annualLeaveTotal})</span>
-                </div>
+              </div>
+
+              <div className="flex justify-between text-xs text-slate-500 -mt-6 px-8">
+                <span>Used ({annualLeaveUsed})</span>
+                <span>Total ({annualLeaveTotal})</span>
               </div>
             </div>
 
@@ -347,8 +346,8 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-white">Leave Overview</h3>
             <div className="flex gap-2">
-              {/* Monthly option removed — only keep Yearly */}
-              <button className="p-1 px-3 rounded-lg bg-slate-800 text-xs text-white">Yearly</button>
+              {/* only Yearly label retained */}
+              <span className="px-3 py-1 rounded-lg bg-slate-800 text-xs text-white">Yearly</span>
             </div>
           </div>
 

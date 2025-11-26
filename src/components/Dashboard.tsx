@@ -347,8 +347,8 @@ export default function Dashboard({ userId, userName, userEmail, userRole, onLog
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-white">Leave Overview</h3>
             <div className="flex gap-2">
+              {/* Monthly option removed — only keep Yearly */}
               <button className="p-1 px-3 rounded-lg bg-slate-800 text-xs text-white">Yearly</button>
-              <button className="p-1 px-3 rounded-lg hover:bg-slate-800 text-xs text-slate-400">Monthly</button>
             </div>
           </div>
 

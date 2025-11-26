@@ -92,7 +92,7 @@ Important:
           }
         ],
         temperature: 0.3,
-        max_tokens: 4096,
+        max_tokens: 2048,
       })
     });
 

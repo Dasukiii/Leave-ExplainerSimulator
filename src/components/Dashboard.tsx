@@ -389,8 +389,8 @@ export default function Dashboard({
                   cursor={{ fill: 'transparent' }}
                   contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#e2e8f0' }}
                 />
-                <Bar dataKey="used" stackId="a" fill="#065f46" radius={[6, 0, 0, 6]} isAnimationActive={true} animationDuration={800} />
-                <Bar dataKey="remaining" stackId="a" fill="#10b981" radius={[0, 6, 6, 0]} isAnimationActive={true} animationDuration={800} />
+                <Bar dataKey="used" stackId="a" fill="#334155" radius={[6, 0, 0, 6]} isAnimationActive={true} animationDuration={800} />
+                <Bar dataKey="remaining" stackId="a" fill="#3b82f6" radius={[0, 6, 6, 0]} isAnimationActive={true} animationDuration={800} />
               </BarChart>
             </ResponsiveContainer>
           </div>

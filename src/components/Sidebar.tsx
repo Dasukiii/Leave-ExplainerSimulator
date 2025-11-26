@@ -44,8 +44,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
           <Sparkles className="text-white" size={20} />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-white tracking-tight">LeaveSim AI</h1>
-          <p className="text-xs text-slate-500">HR Assistant v1.0</p>
+          <h1 className="text-lg font-bold text-white tracking-tight">LeaveExplainer AI</h1>
+          <p className="text-xs text-slate-500">Your Personal Leave Assistant</p>
         </div>
       </div>
 

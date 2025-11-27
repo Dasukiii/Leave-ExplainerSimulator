@@ -15,7 +15,6 @@ import {
   clearSession
 } from './utils/sessionUtils';
 import { validateSession } from './services/sessionValidationService';
-import { Settings as SettingsIcon } from 'lucide-react';
 
 const App: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);

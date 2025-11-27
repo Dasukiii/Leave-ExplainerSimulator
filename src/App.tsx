@@ -7,8 +7,15 @@ import LandingPage from './components/LandingPage';
 import { OnboardingForm } from './components/OnboardingForm';
 import { AppView, User } from './types';
 import { getUserProfile } from './services/userProfileService';
-import { generateSessionToken, setSessionToken, setUserProfileId as saveUserProfileId, getUserProfileId, clearSession } from './utils/sessionUtils';
+import {
+  generateSessionToken,
+  setSessionToken,
+  setUserProfileId as saveUserProfileId,
+  getUserProfileId,
+  clearSession
+} from './utils/sessionUtils';
 import { validateSession } from './services/sessionValidationService';
+import { Settings as SettingsIcon } from 'lucide-react';
 
 const App: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
@@ -31,7 +38,8 @@ const App: React.FC = () => {
         if (profile.hire_date) {
           const hireDate = new Date(profile.hire_date);
           const now = new Date();
-          tenureYears = (now.getTime() - hireDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+          tenureYears =
+            (now.getTime() - hireDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
         }
 
         setUser({
@@ -98,10 +106,7 @@ const App: React.FC = () => {
 
   if (!hasStarted) {
     return (
-      <LandingPage
-        onGetStarted={() => setHasStarted(true)}
-        onAutoLogin={handleAutoLogin}
-      />
+      <LandingPage onGetStarted={() => setHasStarted(true)} onAutoLogin={handleAutoLogin} />
     );
   }
 
@@ -137,20 +142,31 @@ const App: React.FC = () => {
             userEmail={user.email}
             userRole={user.role}
             onLogout={handleLogout}
-            isActive={currentView === AppView.PROFILE} // <-- added prop so Dashboard can replay charts
+            isActive={currentView === AppView.PROFILE}
           />
         );
       case AppView.POLICIES:
         return <PolicyLibrary />;
+      case AppView.SETTINGS:
+        return (
+          <div className="h-full flex flex-col items-center justify-center text-slate-500">
+            <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4">
+              <SettingsIcon size={32} className="opacity-50" />
+            </div>
+            <p>Settings panel coming soon</p>
+          </div>
+        );
+      default:
+        // fallback to chat as a safe default
+        return <ChatInterface user={user} />;
+    }
   };
 
   return (
     <div className="flex h-screen w-screen bg-slate-950 text-slate-200 overflow-hidden">
       <Sidebar currentView={currentView} onChangeView={setCurrentView} user={user} onLogout={handleLogout} />
 
-      <main className="flex-1 ml-64 relative z-10 h-full">
-        {renderContent()}
-      </main>
+      <main className="flex-1 ml-64 relative z-10 h-full">{renderContent()}</main>
 
       {welcomeMessage && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 border border-slate-700 rounded-lg px-6 py-3 shadow-2xl animate-fade-in">

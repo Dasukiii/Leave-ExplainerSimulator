@@ -67,7 +67,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
         <NavItem view={AppView.CHAT} icon={MessageSquare} label="AI Assistant" />
         <NavItem view={AppView.PROFILE} icon={LayoutDashboard} label="My Profile" />
         <NavItem view={AppView.POLICIES} icon={BookOpen} label="Policy Library" />
-        <NavItem view={AppView.SETTINGS} icon={Settings} label="Settings" />
       </div>
 
       {/* User Mini Profile */}

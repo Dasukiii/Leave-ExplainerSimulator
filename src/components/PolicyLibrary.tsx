@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getAllPolicies, Policy, updatePolicy, deleteUserPolicies, createMultiplePolicies } from '../services/policyService';
-import { Search, FileText, ChevronRight, Upload, Edit2, Save, X, Trash2 } from 'lucide-react';
+import { getAllPolicies, Policy, deleteUserPolicies, createMultiplePolicies } from '../services/policyService';
+import { Search, FileText, ChevronRight, Upload } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { extractPoliciesFromPDF } from '../services/aiPdfExtractor';
 import { getUserProfileId } from '../utils/sessionUtils';
@@ -11,14 +11,13 @@ export const PolicyLibrary: React.FC = () => {
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState({ title: '', text_doc: '', category: '' });
   const [uploadError, setUploadError] = useState<string | null>(null);
   const userProfileId = getUserProfileId();
 
   useEffect(() => {
     console.log('[PolicyLibrary] User Profile ID from localStorage:', userProfileId);
     loadPolicies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPolicies = async () => {
@@ -82,29 +81,6 @@ export const PolicyLibrary: React.FC = () => {
     } finally {
       setIsUploading(false);
       e.target.value = '';
-    }
-  };
-
-  const handleEditPolicy = () => {
-    if (activePolicyData) {
-      setEditContent({
-        title: activePolicyData.title,
-        text_doc: activePolicyData.text_doc,
-        category: activePolicyData.category || 'General'
-      });
-      setIsEditing(true);
-    }
-  };
-
-  const handleSaveEdit = async () => {
-    if (!selectedPolicy) return;
-
-    try {
-      await updatePolicy(selectedPolicy, editContent);
-      await loadPolicies();
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating policy:', error);
     }
   };
 
@@ -217,78 +193,23 @@ export const PolicyLibrary: React.FC = () => {
                 >
                   ← Back to list
                 </button>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editContent.title}
-                    onChange={(e) => setEditContent({ ...editContent, title: e.target.value })}
-                    className="text-xl font-bold text-white bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
-                ) : (
-                  <h2 className="text-xl font-bold text-white">{activePolicyData.title}</h2>
-                )}
-                {isEditing ? (
-                  <select
-                    value={editContent.category}
-                    onChange={(e) => setEditContent({ ...editContent, category: e.target.value })}
-                    className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700 mt-2"
-                  >
-                    <option value="Annual Leave">Annual Leave</option>
-                    <option value="Sick Leave">Sick Leave</option>
-                    <option value="Parental Leave">Parental Leave</option>
-                    <option value="Special Leave">Special Leave</option>
-                    <option value="Public Holiday">Public Holiday</option>
-                    <option value="Unpaid Leave">Unpaid Leave</option>
-                    <option value="General">General</option>
-                  </select>
-                ) : (
-                  <span className="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 mt-1 inline-block">
-                    {activePolicyData.category}
-                  </span>
-                )}
+
+                <h2 className="text-xl font-bold text-white">{activePolicyData.title}</h2>
+
+                <span className="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 mt-1 inline-block">
+                  {activePolicyData.category}
+                </span>
               </div>
+
               <div className="flex gap-2">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={handleSaveEdit}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
-                    >
-                      <Save size={16} />
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors"
-                    >
-                      <X size={16} />
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={handleEditPolicy}
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors"
-                  >
-                    <Edit2 size={16} />
-                    Edit
-                  </button>
-                )}
+                {/* Edit functionality removed intentionally to prevent in-app edits */}
               </div>
             </div>
+
             <div className="flex-1 overflow-y-auto p-8">
-              {isEditing ? (
-                <textarea
-                  value={editContent.text_doc}
-                  onChange={(e) => setEditContent({ ...editContent, text_doc: e.target.value })}
-                  className="w-full h-full min-h-[500px] bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-mono text-sm"
-                  placeholder="Enter policy content..."
-                />
-              ) : (
-                <div className="prose prose-invert prose-blue max-w-none">
-                  <ReactMarkdown>{activePolicyData.text_doc}</ReactMarkdown>
-                </div>
-              )}
+              <div className="prose prose-invert prose-blue max-w-none">
+                <ReactMarkdown>{activePolicyData.text_doc}</ReactMarkdown>
+              </div>
             </div>
           </>
         ) : (

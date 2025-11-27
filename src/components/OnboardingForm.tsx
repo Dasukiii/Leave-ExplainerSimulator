@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, User, Briefcase, FileText, ArrowRight, SkipForward, Building2, Upload } from 'lucide-react';
+import { Calendar, User, Briefcase, FileText, ArrowRight, Building2, Upload } from 'lucide-react';
 import { createUserProfile, CreateUserProfileData } from '../services/userProfileService';
 import { extractPoliciesFromPDF } from '../services/aiPdfExtractor';
 import { deleteUserPolicies, createMultiplePolicies } from '../services/policyService';
@@ -18,7 +18,6 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
   });
   const [companyName, setCompanyName] = useState('');
   const [annualDaysTaken, setAnnualDaysTaken] = useState(0);
-  const [sickDaysTaken, setSickDaysTaken] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtractingPDF, setIsExtractingPDF] = useState(false);
@@ -61,9 +60,10 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
         return;
       }
 
+      // Only annualDaysTaken is collected here. Sick stays at default (10).
       const allLeaveBalances = {
         annual: Math.max(0, 18 - annualDaysTaken),
-        sick: Math.max(0, 10 - sickDaysTaken)
+        sick: 10
       };
 
       let uploadedPolicyUrl = '';
@@ -131,24 +131,6 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
       setError('Failed to save your profile. Please try again.');
       setIsSubmitting(false);
     }
-  };
-
-  const handleSkip = () => {
-    const defaultProfile: CreateUserProfileData = {
-      hire_date: new Date().toISOString().split('T')[0],
-      employment_type: 'Permanent',
-      leave_balances: { annual: 18, sick: 10 },
-      leaves_taken: [],
-    };
-
-    setIsSubmitting(true);
-    createUserProfile(defaultProfile)
-      .then((profile) => onComplete(profile.id))
-      .catch((err) => {
-        console.error('Error creating default profile:', err);
-        setError('Failed to skip onboarding. Please try again.');
-        setIsSubmitting(false);
-      });
   };
 
   return (
@@ -248,19 +230,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
                 <span className="text-xs text-slate-500 mt-1 block">out of 18 days</span>
               </div>
 
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Sick Leave Days Taken</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={sickDaysTaken}
-                  onChange={(e) => setSickDaysTaken(parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-500 transition-all"
-                />
-                <span className="text-xs text-slate-500 mt-1 block">out of 10 days</span>
-              </div>
+              {/* Sick leave input removed per request */}
             </div>
           </div>
 
@@ -336,16 +306,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
           )}
 
           <div className="flex gap-4 pt-4">
-            <button
-              type="button"
-              onClick={handleSkip}
-              disabled={isSubmitting}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700"
-            >
-              <SkipForward size={18} />
-              Skip for now
-            </button>
-
+            {/* Skip button removed per request - only Save & Start Chatting remains */}
             <button
               type="submit"
               disabled={isSubmitting}

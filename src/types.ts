@@ -21,5 +21,4 @@ export enum AppView {
   CHAT = 'CHAT',
   PROFILE = 'PROFILE',
   POLICIES = 'POLICIES',
-  SETTINGS = 'SETTINGS',
 }

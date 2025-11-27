@@ -23,6 +23,10 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtractingPDF, setIsExtractingPDF] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+
+  // New state: user must accept privacy policy before extraction runs
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,12 +42,16 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
       }
       setUploadedFile(file);
       setError(null);
+      setInfo(null);
+      // Reset privacy acceptance when file changes to force explicit consent for the new file
+      setAcceptedPrivacy(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     setIsSubmitting(true);
 
     try {
@@ -74,7 +82,16 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
 
       const profile = await createUserProfile(profilePayload);
 
-      if (uploadedFile) {
+      // If user uploaded a file but did NOT accept privacy policy, skip extraction
+      if (uploadedFile && !acceptedPrivacy) {
+        setInfo('You uploaded a company policy, but you did not accept the privacy policy. Extraction was skipped. If you want automatic extraction, re-upload the file and accept the privacy notice.');
+        // We still created the profile above; continue to completion.
+        onComplete(profile.id);
+        return;
+      }
+
+      // If uploadedFile exists and user accepted privacy, proceed to extract and save policies
+      if (uploadedFile && acceptedPrivacy) {
         try {
           setIsExtractingPDF(true);
           console.log('[OnboardingForm] Starting PDF extraction...');
@@ -83,8 +100,8 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
 
           if (extractedPolicies.length > 0) {
             console.log('[OnboardingForm] Deleting user-specific policies and saving new ones...');
-            console.log('[OnboardingForm] User profile ID:', profile.id);
             await deleteUserPolicies(profile.id);
+
             const newPolicies = extractedPolicies.map(p => ({
               title: p.title,
               category: p.category,
@@ -92,14 +109,19 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
               source_url: null,
               user_profile_id: profile.id
             }));
+
             console.log('[OnboardingForm] Saving policies with user_profile_id:', profile.id);
             const savedPolicies = await createMultiplePolicies(newPolicies);
             console.log('[OnboardingForm] Policies saved successfully:', savedPolicies.length);
+            setInfo(`Extracted and saved ${savedPolicies.length} policy items.`);
+          } else {
+            setInfo('No policy sections were detected in the uploaded document.');
           }
-          setIsExtractingPDF(false);
         } catch (pdfError) {
-          setIsExtractingPDF(false);
           console.error('[OnboardingForm] Error processing PDF:', pdfError);
+          setError('There was a problem extracting policies from the uploaded file. The profile was still created.');
+        } finally {
+          setIsExtractingPDF(false);
         }
       }
 
@@ -242,8 +264,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
             </div>
           </div>
 
-          {/* Removed the dynamic "Add Leave / Leaves Taken list" block per request */}
-
+          {/* Upload + Privacy acceptance */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-3">
               Upload Company Leave Policy <span className="text-slate-500">(optional)</span>
@@ -271,6 +292,29 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
                 )}
               </label>
             </div>
+
+            {/* Privacy acceptance checkbox - required for extraction */}
+            {uploadedFile && (
+              <div className="mt-3 flex items-start gap-3">
+                <input
+                  id="accept-privacy"
+                  type="checkbox"
+                  checked={acceptedPrivacy}
+                  onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                  className="mt-1 accent-blue-500 w-4 h-4 rounded"
+                />
+                <label htmlFor="accept-privacy" className="text-xs text-slate-400">
+                  I consent to upload and allow automatic extraction of my company's policy for the purpose of
+                  identifying leave rules. I understand extracted data will be stored and used only to personalize
+                  leave calculations. Read the{' '}
+                  <a href="/privacy" target="_blank" rel="noreferrer" className="text-blue-400 underline">
+                    privacy policy
+                  </a>
+                  .
+                </label>
+              </div>
+            )}
+
             {!import.meta.env.VITE_OPENAI_API_KEY && uploadedFile && (
               <p className="text-xs text-amber-400 mt-2 flex items-start gap-2">
                 <span className="text-amber-500">⚠</span>
@@ -282,6 +326,12 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-red-400 text-sm">
               {error}
+            </div>
+          )}
+
+          {info && (
+            <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-slate-300 text-sm">
+              {info}
             </div>
           )}
 

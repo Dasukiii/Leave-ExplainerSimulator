@@ -227,7 +227,6 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
                   placeholder="0"
                   className="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-500 transition-all"
                 />
-                <span className="text-xs text-slate-500 mt-1 block">out of 18 days</span>
               </div>
 
               {/* Sick leave input removed per request */}

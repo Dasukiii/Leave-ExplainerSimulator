@@ -19,6 +19,5 @@ export interface Policy {
 export enum AppView {
   LANDING = 'LANDING',
   CHAT = 'CHAT',
-  PROFILE = 'PROFILE',
   POLICIES = 'POLICIES',
 }

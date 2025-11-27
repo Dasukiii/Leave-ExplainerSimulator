@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ChatInterface } from './components/ChatInterface';
-import Dashboard from './components/Dashboard';
 import { PolicyLibrary } from './components/PolicyLibrary';
 import LandingPage from './components/LandingPage';
 import { OnboardingForm } from './components/OnboardingForm';
@@ -11,7 +10,6 @@ import {
   generateSessionToken,
   setSessionToken,
   setUserProfileId as saveUserProfileId,
-  getUserProfileId,
   clearSession
 } from './utils/sessionUtils';
 import { validateSession } from './services/sessionValidationService';
@@ -19,7 +17,6 @@ import { validateSession } from './services/sessionValidationService';
 const App: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
-  const [userProfileId, setUserProfileId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<AppView>(AppView.CHAT);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,9 +44,12 @@ const App: React.FC = () => {
           email: 'user@company.com',
           role: profile.employment_type || 'Full-time',
           tenureYears: Math.floor(tenureYears * 10) / 10,
+          hireDate: profile.hire_date || '',
           balances: {
             annual: profile.leave_balances?.annual || 18,
             sick: profile.leave_balances?.sick || 10,
+            personal: 0,
+            parental: 0,
           },
         });
         setHasOnboarded(true);
@@ -91,7 +91,6 @@ const App: React.FC = () => {
     const sessionToken = generateSessionToken();
     setSessionToken(sessionToken);
     saveUserProfileId(profileId);
-    setUserProfileId(profileId);
     loadUserProfile(profileId);
   };
 
@@ -125,7 +124,6 @@ const App: React.FC = () => {
     clearSession();
     setHasStarted(false);
     setHasOnboarded(false);
-    setUserProfileId(null);
     setUser(null);
   };
 
@@ -133,21 +131,9 @@ const App: React.FC = () => {
     switch (currentView) {
       case AppView.CHAT:
         return <ChatInterface user={user} />;
-      case AppView.PROFILE:
-        return (
-          <Dashboard
-            userId={user.id}
-            userName={user.name}
-            userEmail={user.email}
-            userRole={user.role}
-            onLogout={handleLogout}
-            isActive={currentView === AppView.PROFILE}
-          />
-        );
       case AppView.POLICIES:
         return <PolicyLibrary />;
       default:
-        // fallback to chat as a safe default
         return <ChatInterface user={user} />;
     }
   };
@@ -156,7 +142,7 @@ const App: React.FC = () => {
     <div className="flex h-screen w-screen bg-slate-950 text-slate-200 overflow-hidden">
       <Sidebar currentView={currentView} onChangeView={setCurrentView} user={user} onLogout={handleLogout} />
 
-      <main className="flex-1 ml-64 relative z-10 h-full">{renderContent()}</main>
+      <main className="flex-1 ml-80 relative z-10 h-full">{renderContent()}</main>
 
       {welcomeMessage && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 border border-slate-700 rounded-lg px-6 py-3 shadow-2xl animate-fade-in">

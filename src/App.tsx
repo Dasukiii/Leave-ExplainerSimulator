@@ -143,18 +143,6 @@ const App: React.FC = () => {
         );
       case AppView.POLICIES:
         return <PolicyLibrary />;
-      case AppView.SETTINGS:
-        return (
-          <div className="h-full flex flex-col items-center justify-center text-slate-500">
-            <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4">
-              <SettingsIcon size={32} className="opacity-50" />
-            </div>
-            <p>Settings panel coming soon</p>
-          </div>
-        );
-      default:
-        return <ChatInterface user={user} />;
-    }
   };
 
   return (

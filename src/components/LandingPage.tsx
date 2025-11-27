@@ -60,7 +60,7 @@ export default function LandingPage({ onGetStarted, onAutoLogin }: LandingPagePr
               <img
                 src={kadoshIcon}
                 alt="Kadosh AI"
-                className="w-6 h-6 object-contain rounded-sm"
+                className="w-32 h-8 object-contain rounded-sm"
                 // it's fine to adjust filter or bg here if you want to hide white background:
                 // e.g. style={{ filter: 'grayscale(0.2) contrast(0.95)' }}
               />

@@ -74,7 +74,7 @@ Employees who have completed at least 12 months of continuous service are eligib
 ];
 
 export const SYSTEM_INSTRUCTION_TEMPLATE = `
-You are "LeaveSim", an advanced HR assistant for a company.
+You are "LeaveExplainer", an advanced HR assistant for a company.
 Your goal is to answer employee questions about leave policies, simulate leave balances, and check eligibility.
 
 CONTEXT:

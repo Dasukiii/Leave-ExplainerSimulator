@@ -44,28 +44,29 @@ export default function LandingPage({ onGetStarted, onAutoLogin }: LandingPagePr
       </div>
 
       <div className="z-10 text-center max-w-3xl px-6">
-        <div className="inline-flex flex-col items-center gap-2 mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 text-xs font-medium animate-fade-in-up">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            AI-Powered HR Assistant
-          </div>
+        {/* Powered by Kadosh badge (replaces previous AI-Powered label) */}
+        <div className="inline-flex items-center gap-3 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 text-xs font-medium mb-8 animate-fade-in-up">
+          {/* pulse dot */}
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <span className="uppercase tracking-wide text-[11px] text-slate-300">Powered by</span>
 
-          {/* Powered by Kadosh icon (small, subtle) */}
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span>Powered by</span>
-            <span
-              className="inline-flex items-center justify-center rounded-md p-0.5"
-              style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-            >
-              <img
-                src={kadoshIcon}
-                alt="Kadosh AI"
-                className="w-32 h-8 object-contain rounded-sm"
-                // it's fine to adjust filter or bg here if you want to hide white background:
-                // e.g. style={{ filter: 'grayscale(0.2) contrast(0.95)' }}
-              />
-            </span>
-          </div>
+          {/* icon container — subtle background to help non-transparent image blend */}
+          <span
+            className="ml-1 inline-flex items-center justify-center rounded-sm p-1"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+            }}
+            aria-hidden
+          >
+            <img
+              src={kadoshIcon}
+              alt="Kadosh AI"
+              className="w-28 h-8 object-contain rounded-sm shadow-sm"
+              // tweak filter if desired, user can adjust later:
+              // style={{ filter: 'contrast(0.95) saturate(0.9)' }}
+            />
+          </span>
         </div>
 
         <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6 leading-tight">

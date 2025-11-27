@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, MessageSquare, CheckCircle, PieChart, Loader2 } from 'lucide-react';
+import kadoshIcon from '../kadosh-ai-icon.png';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -43,15 +44,37 @@ export default function LandingPage({ onGetStarted, onAutoLogin }: LandingPagePr
       </div>
 
       <div className="z-10 text-center max-w-3xl px-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 text-xs font-medium mb-8 animate-fade-in-up">
-           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-           AI-Powered HR Assistant
+        <div className="inline-flex flex-col items-center gap-2 mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 text-xs font-medium animate-fade-in-up">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            AI-Powered HR Assistant
+          </div>
+
+          {/* Powered by Kadosh icon (small, subtle) */}
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <span>Powered by</span>
+            <span
+              className="inline-flex items-center justify-center rounded-md p-0.5"
+              style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+            >
+              <img
+                src={kadoshIcon}
+                alt="Kadosh AI"
+                className="w-6 h-6 object-contain rounded-sm"
+                // it's fine to adjust filter or bg here if you want to hide white background:
+                // e.g. style={{ filter: 'grayscale(0.2) contrast(0.95)' }}
+              />
+            </span>
+          </div>
         </div>
-        
+
         <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight mb-6 leading-tight">
-          Instant answers to your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">leave questions</span>
+          Instant answers to your{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
+            leave questions
+          </span>
         </h1>
-        
+
         <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
           No HR waiting. Get instant policy citations, check personalized eligibility, and simulate your leave balances in seconds.
         </p>
@@ -77,9 +100,9 @@ export default function LandingPage({ onGetStarted, onAutoLogin }: LandingPagePr
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 text-left">
           {[
-            { icon: MessageSquare, title: "AI Chatbot", desc: "Instant answers with policy citations" },
-            { icon: CheckCircle, title: "Eligibility Check", desc: "Personalized based on your tenure" },
-            { icon: PieChart, title: "Leave Simulation", desc: "Visualize future balance scenarios" }
+            { icon: MessageSquare, title: 'AI Chatbot', desc: 'Instant answers with policy citations' },
+            { icon: CheckCircle, title: 'Eligibility Check', desc: 'Personalized based on your tenure' },
+            { icon: PieChart, title: 'Leave Simulation', desc: 'Visualize future balance scenarios' }
           ].map((feature, idx) => {
             const Icon = feature.icon;
             return (

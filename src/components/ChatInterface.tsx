@@ -3,7 +3,7 @@ import { Message, User } from '../types';
 import { sendMessageToOpenAI } from '../services/openaiClient';
 import { getAllPolicies } from '../services/policyService';
 import { getOrCreateChatSession, updateChatSession, ChatSession } from '../services/chatSessionService';
-import { Send, Bot, User as UserIcon, Sparkles, AlertCircle, RefreshCw, Download } from 'lucide-react';
+import { Send, Bot, User as UserIcon, Sparkles, AlertCircle, RefreshCw, Download, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface ChatInterfaceProps {
@@ -28,6 +28,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
 
   useEffect(() => {
     loadChatSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id]);
 
   const loadChatSession = async () => {
@@ -91,6 +92,32 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
     }
   };
 
+  // --- New: Clear chat handler ---
+  const clearChat = async () => {
+    if (messages.length === 0) return;
+
+    const confirmed = window.confirm('Are you sure you want to clear the chat? This will remove all messages from this session.');
+    if (!confirmed) return;
+
+    // Optimistic UI update
+    setIsLoading(true);
+    setMessages([]);
+    scrollToBottom();
+
+    try {
+      if (sessionId) {
+        await updateChatSession(sessionId, []); // persist cleared session
+      }
+      // if you want to rotate sessionId or create a brand new session instead, do that here
+    } catch (err) {
+      console.error('[ChatInterface] Failed to clear remote session:', err);
+      // optional: show an error toast or revert; for now we'll log only
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  // --- end clear chat ---
+
   const suggestions = [
     "How much annual leave do I have?",
     "Simulate 5 days leave in August",
@@ -127,13 +154,26 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   return (
     <div className="h-full flex flex-col relative overflow-hidden bg-slate-950">
       {messages.length > 0 && (
-        <div className="absolute top-4 right-6 z-30">
+        <div className="absolute top-4 right-6 z-30 flex gap-2">
           <button
             onClick={exportToPDF}
             className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded-lg transition-all shadow-lg"
+            aria-label="Export chat"
+            title="Export chat"
           >
             <Download size={16} />
             <span className="text-sm">Export Chat</span>
+          </button>
+
+          <button
+            onClick={clearChat}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-red-700/10 hover:bg-red-700/20 border border-red-700/20 text-red-300 rounded-lg transition-all shadow-sm disabled:opacity-50"
+            aria-label="Clear chat"
+            title="Clear chat"
+          >
+            <Trash2 size={16} />
+            <span className="text-sm">Clear</span>
           </button>
         </div>
       )}

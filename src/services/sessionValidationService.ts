@@ -20,7 +20,7 @@ export const validateSession = async (profileId: string | null): Promise<Session
     const profile = await getUserProfile(profileId);
 
     if (!profile) {
-      console.log('[sessionValidationService] Profile not found in database');
+      console.log('[sessionValidationService] Profile not found in localStorage');
       return {
         isValid: false,
         profileId: null,

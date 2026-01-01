@@ -1,5 +1,3 @@
-import { supabase } from '../lib/supabaseClient';
-
 export interface LeaveBalance {
   annual?: number;
   sick?: number;
@@ -34,60 +32,77 @@ export interface CreateUserProfileData {
   uploaded_policy_url?: string;
 }
 
-export const createUserProfile = async (profileData: CreateUserProfileData): Promise<UserProfile> => {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .insert([profileData])
-    .select()
-    .single();
+const STORAGE_KEY = 'user_profiles';
 
-  if (error) throw error;
-  return data;
+const generateId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
+const getProfiles = (): UserProfile[] => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : [];
+};
+
+const saveProfiles = (profiles: UserProfile[]): void => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+};
+
+export const createUserProfile = async (profileData: CreateUserProfileData): Promise<UserProfile> => {
+  const profiles = getProfiles();
+
+  const newProfile: UserProfile = {
+    id: generateId(),
+    name: profileData.name,
+    hire_date: profileData.hire_date,
+    employment_type: profileData.employment_type,
+    leave_balances: profileData.leave_balances || {},
+    leaves_taken: profileData.leaves_taken || [],
+    uploaded_policy_url: profileData.uploaded_policy_url,
+    created_at: new Date().toISOString(),
+  };
+
+  profiles.push(newProfile);
+  saveProfiles(profiles);
+
+  return newProfile;
 };
 
 export const getUserProfile = async (profileId: string): Promise<UserProfile | null> => {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('id', profileId)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data;
+  const profiles = getProfiles();
+  return profiles.find(p => p.id === profileId) || null;
 };
 
 export const getLatestUserProfile = async (): Promise<UserProfile | null> => {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const profiles = getProfiles();
+  if (profiles.length === 0) return null;
 
-  if (error) throw error;
-  return data;
+  return profiles.sort((a, b) =>
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )[0];
 };
 
 export const updateUserProfile = async (
   profileId: string,
   updates: Partial<CreateUserProfileData>
 ): Promise<UserProfile> => {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .update(updates)
-    .eq('id', profileId)
-    .select()
-    .single();
+  const profiles = getProfiles();
+  const index = profiles.findIndex(p => p.id === profileId);
 
-  if (error) throw error;
-  return data;
+  if (index === -1) {
+    throw new Error('Profile not found');
+  }
+
+  profiles[index] = {
+    ...profiles[index],
+    ...updates,
+  };
+
+  saveProfiles(profiles);
+  return profiles[index];
 };
 
 export const deleteUserProfile = async (profileId: string): Promise<void> => {
-  const { error } = await supabase
-    .from('user_profiles')
-    .delete()
-    .eq('id', profileId);
-
-  if (error) throw error;
+  const profiles = getProfiles();
+  const filtered = profiles.filter(p => p.id !== profileId);
+  saveProfiles(filtered);
 };

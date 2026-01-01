@@ -1,8 +1,6 @@
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Configure PDF.js worker
-// Using unpkg as a reliable CDN for the worker file
-const PDFJS_VERSION = '5.4.394'; // Match the installed version
+const PDFJS_VERSION = '5.4.394';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${PDFJS_VERSION}/build/pdf.worker.min.mjs`;
 
 console.log('PDF.js configured with worker:', pdfjsLib.GlobalWorkerOptions.workerSrc);
@@ -77,44 +75,100 @@ export const extractPoliciesFromPDF = async (file: File): Promise<ExtractedPolic
     const pdfText = await extractTextFromPDFBuffer(file);
     console.log(`Extracted ${pdfText.length} characters from PDF`);
 
-    console.log('Calling Supabase Edge Function...');
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Supabase configuration not found');
+    if (!openaiApiKey) {
+      throw new Error('OpenAI API key not configured. Please add VITE_OPENAI_API_KEY to your environment.');
     }
 
-    const functionUrl = `${supabaseUrl}/functions/v1/extract-policies`;
+    console.log('Calling OpenAI API for policy extraction...');
 
-    const response = await fetch(functionUrl, {
+    const systemPrompt = `You are an expert HR policy analyst. Your task is to extract and structure leave policies from documents.
+
+When given a document text, you must:
+1. Read and understand all leave-related policies in the document
+2. Extract each distinct policy section
+3. Categorize each policy appropriately
+4. Return the policies in a structured JSON format
+
+Categories you should use:
+- Annual Leave
+- Sick Leave
+- Parental Leave
+- Special Leave
+- Public Holiday
+- Unpaid Leave
+- General
+
+Return ONLY a valid JSON array with this exact structure:
+[
+  {
+    "title": "Policy Title",
+    "category": "Category Name",
+    "content": "Full policy content text with all details, rules, and conditions"
+  }
+]
+
+Important:
+- Include ALL details from each policy section
+- Keep the content comprehensive and complete
+- Ensure each policy has a clear, descriptive title
+- Use proper categorization
+- Return ONLY the JSON array, no other text`;
+
+    const userPrompt = `Please extract all leave policies from this document text. Return them as a JSON array following the specified format.\n\nDocument text:\n${pdfText}`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Authorization': `Bearer ${openaiApiKey}`
       },
-      body: JSON.stringify({ pdfText })
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: userPrompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 2048,
+      })
     });
 
-    console.log('Edge Function response status:', response.status);
+    console.log('OpenAI API response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('Edge Function Error:', errorData);
-      throw new Error(`API request failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      console.error('OpenAI API Error:', errorData);
+      throw new Error(`API request failed: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
-    console.log('Received response from Edge Function');
+    console.log('Received response from OpenAI');
 
-    if (!data.policies || !Array.isArray(data.policies)) {
-      throw new Error('Invalid response from Edge Function');
+    if (!data.choices || !data.choices[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI API');
     }
 
-    const policies: ExtractedPolicy[] = data.policies;
+    const content = data.choices[0].message.content.trim();
+    console.log('AI response content length:', content.length);
+
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      console.error('Could not find JSON in response:', content.substring(0, 500));
+      throw new Error('Could not find JSON array in AI response');
+    }
+
+    const policies: ExtractedPolicy[] = JSON.parse(jsonMatch[0]);
     console.log('Parsed policies:', policies.length);
 
-    if (policies.length === 0) {
+    if (!Array.isArray(policies) || policies.length === 0) {
       throw new Error('No policies extracted from PDF');
     }
 

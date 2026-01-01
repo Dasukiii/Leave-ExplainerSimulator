@@ -1,4 +1,3 @@
-import { supabase } from '../lib/supabaseClient';
 import { Message } from '../types';
 
 export interface ChatSession {
@@ -9,24 +8,32 @@ export interface ChatSession {
   created_at: string;
 }
 
+const STORAGE_KEY = 'chat_sessions';
+
+const generateId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
+
+const getChatSessions = (): ChatSession[] => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : [];
+};
+
+const saveChatSessions = (sessions: ChatSession[]): void => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+};
+
 export const getChatSession = async (userProfileId: string): Promise<ChatSession | null> => {
   console.log('[chatSessionService] Getting chat session for user:', userProfileId);
 
-  const { data, error } = await supabase
-    .from('chat_sessions')
-    .select('*')
-    .eq('user_profile_id', userProfileId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const sessions = getChatSessions();
+  const userSessions = sessions
+    .filter(s => s.user_profile_id === userProfileId)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  if (error) {
-    console.error('[chatSessionService] Error fetching chat session:', error);
-    throw error;
-  }
-
-  console.log('[chatSessionService] Found chat session:', data ? 'Yes' : 'No');
-  return data;
+  const session = userSessions[0] || null;
+  console.log('[chatSessionService] Found chat session:', session ? 'Yes' : 'No');
+  return session;
 };
 
 export const createChatSession = async (
@@ -35,25 +42,21 @@ export const createChatSession = async (
 ): Promise<ChatSession> => {
   console.log('[chatSessionService] Creating new chat session for user:', userProfileId);
 
-  const { data, error } = await supabase
-    .from('chat_sessions')
-    .insert([
-      {
-        user_profile_id: userProfileId,
-        session_label: `Chat ${new Date().toLocaleDateString()}`,
-        messages: messages,
-      },
-    ])
-    .select()
-    .single();
+  const sessions = getChatSessions();
 
-  if (error) {
-    console.error('[chatSessionService] Error creating chat session:', error);
-    throw error;
-  }
+  const newSession: ChatSession = {
+    id: generateId(),
+    user_profile_id: userProfileId,
+    session_label: `Chat ${new Date().toLocaleDateString()}`,
+    messages: messages,
+    created_at: new Date().toISOString(),
+  };
 
-  console.log('[chatSessionService] Chat session created:', data.id);
-  return data;
+  sessions.push(newSession);
+  saveChatSessions(sessions);
+
+  console.log('[chatSessionService] Chat session created:', newSession.id);
+  return newSession;
 };
 
 export const updateChatSession = async (
@@ -62,15 +65,15 @@ export const updateChatSession = async (
 ): Promise<void> => {
   console.log('[chatSessionService] Updating chat session:', sessionId, 'with', messages.length, 'messages');
 
-  const { error } = await supabase
-    .from('chat_sessions')
-    .update({ messages })
-    .eq('id', sessionId);
+  const sessions = getChatSessions();
+  const index = sessions.findIndex(s => s.id === sessionId);
 
-  if (error) {
-    console.error('[chatSessionService] Error updating chat session:', error);
-    throw error;
+  if (index === -1) {
+    throw new Error('Chat session not found');
   }
+
+  sessions[index].messages = messages;
+  saveChatSessions(sessions);
 
   console.log('[chatSessionService] Chat session updated successfully');
 };

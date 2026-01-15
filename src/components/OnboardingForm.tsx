@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, User, Briefcase, FileText, ArrowRight, Building2, Upload } from 'lucide-react';
+import { Calendar, User, Briefcase, FileText, ArrowRight, ArrowLeft, Building2, Upload } from 'lucide-react';
 import { createUserProfile, CreateUserProfileData } from '../services/userProfileService';
 import { extractPoliciesFromPDF } from '../services/aiPdfExtractor';
 import { deleteUserPolicies, createMultiplePolicies } from '../services/policyService';
@@ -7,9 +7,10 @@ import { deleteUserPolicies, createMultiplePolicies } from '../services/policySe
 interface OnboardingFormProps {
   onComplete: (profileId: string) => void;
   onPrivacyClick?: () => void;
+  onBack?: () => void;
 }
 
-export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPrivacyClick }) => {
+export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPrivacyClick, onBack }) => {
   const [formData, setFormData] = useState<CreateUserProfileData>({
     name: '',
     hire_date: '',
@@ -139,6 +140,17 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="w-full max-w-3xl relative z-10 py-12">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8"
+          >
+            <ArrowLeft size={20} />
+            Back
+          </button>
+        )}
+
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600/20 rounded-2xl mb-6 border border-blue-500/30">
             <FileText className="w-8 h-8 text-blue-400" />

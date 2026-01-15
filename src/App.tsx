@@ -130,7 +130,13 @@ const App: React.FC = () => {
   }
 
   if (!hasOnboarded) {
-    return <OnboardingForm onComplete={handleOnboardingComplete} onPrivacyClick={handleShowPrivacy} />;
+    return (
+      <OnboardingForm
+        onComplete={handleOnboardingComplete}
+        onPrivacyClick={handleShowPrivacy}
+        onBack={() => setHasStarted(false)}
+      />
+    );
   }
 
   if (!user) {

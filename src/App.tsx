@@ -4,6 +4,7 @@ import { ChatInterface } from './components/ChatInterface';
 import { PolicyLibrary } from './components/PolicyLibrary';
 import LandingPage from './components/LandingPage';
 import { OnboardingForm } from './components/OnboardingForm';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { AppView, User } from './types';
 import { getUserProfile } from './services/userProfileService';
 import {
@@ -21,6 +22,8 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>(AppView.CHAT);
   const [isLoading, setIsLoading] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState<string | null>(null);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [previousState, setPreviousState] = useState<{ hasStarted: boolean; hasOnboarded: boolean } | null>(null);
 
   useEffect(() => {
     setIsLoading(false);
@@ -94,6 +97,20 @@ const App: React.FC = () => {
     loadUserProfile(profileId);
   };
 
+  const handleShowPrivacy = () => {
+    setPreviousState({ hasStarted, hasOnboarded });
+    setShowPrivacy(true);
+  };
+
+  const handleHidePrivacy = () => {
+    setShowPrivacy(false);
+    setPreviousState(null);
+  };
+
+  if (showPrivacy) {
+    return <PrivacyPolicy onBack={handleHidePrivacy} />;
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center">
@@ -104,12 +121,16 @@ const App: React.FC = () => {
 
   if (!hasStarted) {
     return (
-      <LandingPage onGetStarted={() => setHasStarted(true)} onAutoLogin={handleAutoLogin} />
+      <LandingPage
+        onGetStarted={() => setHasStarted(true)}
+        onAutoLogin={handleAutoLogin}
+        onPrivacyClick={handleShowPrivacy}
+      />
     );
   }
 
   if (!hasOnboarded) {
-    return <OnboardingForm onComplete={handleOnboardingComplete} />;
+    return <OnboardingForm onComplete={handleOnboardingComplete} onPrivacyClick={handleShowPrivacy} />;
   }
 
   if (!user) {

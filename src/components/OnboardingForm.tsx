@@ -6,9 +6,10 @@ import { deleteUserPolicies, createMultiplePolicies } from '../services/policySe
 
 interface OnboardingFormProps {
   onComplete: (profileId: string) => void;
+  onPrivacyClick?: () => void;
 }
 
-export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) => {
+export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPrivacyClick }) => {
   const [formData, setFormData] = useState<CreateUserProfileData>({
     name: '',
     hire_date: '',
@@ -276,9 +277,13 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) =>
                   I consent to upload and allow automatic extraction of my company's policy for the purpose of
                   identifying leave rules. I understand extracted data will be stored and used only to personalize
                   leave calculations. Read the{' '}
-                  <a href="/privacy" target="_blank" rel="noreferrer" className="text-blue-400 underline">
+                  <button
+                    type="button"
+                    onClick={onPrivacyClick}
+                    className="text-blue-400 underline hover:text-blue-300 transition-colors"
+                  >
                     privacy policy
-                  </a>
+                  </button>
                   .
                 </label>
               </div>

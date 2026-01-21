@@ -98,32 +98,28 @@ export default function LandingPage({ onGetStarted, onAutoLogin, onPrivacyClick 
 
       <footer className="relative z-10 border-t border-slate-800/50 bg-slate-950/80 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-slate-500 text-sm">Powered by</span>
-              <span
-                className="inline-flex items-center justify-center rounded-sm p-1"
-                style={{
-                  background: 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
-                }}
-              >
-                <img
-                  src={kadoshIcon}
-                  alt="Kadosh AI"
-                  className="w-24 h-7 object-contain rounded-sm"
-                />
-              </span>
-            </div>
-
-            <div className="flex items-center gap-6 text-sm">
-              <span className="text-slate-500">2026 Leave Explainer. All rights reserved.</span>
-              <button
-                onClick={onPrivacyClick}
-                className="text-slate-400 hover:text-blue-400 transition-colors"
-              >
-                Privacy Policy
-              </button>
-            </div>
+          <div className="flex items-center justify-center gap-2 text-sm">
+            <span className="text-slate-500">Copyright © 2026</span>
+            <span
+              className="inline-flex items-center justify-center rounded-sm p-1"
+              style={{
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))',
+              }}
+            >
+              <img
+                src={kadoshIcon}
+                alt="Kadosh AI"
+                className="w-20 h-6 object-contain rounded-sm"
+              />
+            </span>
+            <span className="text-slate-500">All rights reserved.</span>
+            <span className="text-slate-600 mx-2">|</span>
+            <button
+              onClick={onPrivacyClick}
+              className="text-slate-400 hover:text-blue-400 transition-colors"
+            >
+              PDPA Policy
+            </button>
           </div>
         </div>
       </footer>

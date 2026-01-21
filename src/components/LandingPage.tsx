@@ -76,15 +76,15 @@ export default function LandingPage({ onGetStarted, onAutoLogin, onPrivacyClick 
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 text-left">
             {[
-              { icon: MessageSquare, title: 'AI Chatbot', desc: 'Instant answers with policy citations' },
-              { icon: CheckCircle, title: 'Eligibility Check', desc: 'Personalized based on your tenure' },
-              { icon: PieChart, title: 'Leave Simulation', desc: 'Visualize future balance scenarios' }
+              { icon: MessageSquare, title: 'AI Chatbot', desc: 'Instant answers with policy citations', glowColor: 'hover:shadow-[0_0_30px_rgba(59,130,246,0.6)]' },
+              { icon: CheckCircle, title: 'Eligibility Check', desc: 'Personalized based on your tenure', glowColor: 'hover:shadow-[0_0_30px_rgba(34,197,94,0.6)]' },
+              { icon: PieChart, title: 'Leave Simulation', desc: 'Visualize future balance scenarios', glowColor: 'hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]' }
             ].map((feature, idx) => {
               const Icon = feature.icon;
               return (
                 <div
                   key={idx}
-                  className="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-colors"
+                  className={`p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 ${feature.glowColor}`}
                 >
                   <Icon className="text-blue-400 mb-4" size={28} />
                   <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>

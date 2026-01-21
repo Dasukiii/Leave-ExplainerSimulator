@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, User, Briefcase, FileText, ArrowRight, ArrowLeft, Building2, Upload } from 'lucide-react';
+import { Calendar, User, Briefcase, FileText, ArrowRight, ArrowLeft, Building2, Upload, X } from 'lucide-react';
 import { createUserProfile, CreateUserProfileData } from '../services/userProfileService';
 import { extractPoliciesFromPDF } from '../services/aiPdfExtractor';
 import { deleteUserPolicies, createMultiplePolicies } from '../services/policyService';
@@ -20,31 +20,52 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
   });
   const [companyName, setCompanyName] = useState('');
   const [annualDaysTaken, setAnnualDaysTaken] = useState(0);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtractingPDF, setIsExtractingPDF] = useState(false);
+  const [extractionProgress, setExtractionProgress] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
-  // New state: user must accept privacy policy before extraction runs
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = e.target.files;
+    if (files && files.length > 0) {
       const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!allowedTypes.includes(file.type)) {
-        setError('Please upload a PDF or DOCX file');
-        return;
+      const validFiles: File[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!allowedTypes.includes(file.type)) {
+          setError(`${file.name}: Only PDF or DOCX files are allowed`);
+          continue;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          setError(`${file.name}: File size must be less than 10MB`);
+          continue;
+        }
+        const isDuplicate = uploadedFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!isDuplicate) {
+          validFiles.push(file);
+        }
       }
-      if (file.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB');
-        return;
+
+      if (validFiles.length > 0) {
+        setUploadedFiles(prev => [...prev, ...validFiles]);
+        setError(null);
+        setInfo(null);
+        if (uploadedFiles.length === 0) {
+          setAcceptedPrivacy(false);
+        }
       }
-      setUploadedFile(file);
-      setError(null);
-      setInfo(null);
-      // Reset privacy acceptance when file changes to force explicit consent for the new file
+      e.target.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    if (uploadedFiles.length <= 1) {
       setAcceptedPrivacy(false);
     }
   };
@@ -62,15 +83,14 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
         return;
       }
 
-      // Only annualDaysTaken is collected here. Sick stays at default (10).
       const allLeaveBalances = {
         annual: Math.max(0, 18 - annualDaysTaken),
         sick: 10
       };
 
       let uploadedPolicyUrl = '';
-      if (uploadedFile) {
-        uploadedPolicyUrl = `uploaded-policy-${Date.now()}-${uploadedFile.name}`;
+      if (uploadedFiles.length > 0) {
+        uploadedPolicyUrl = uploadedFiles.map(f => `uploaded-policy-${Date.now()}-${f.name}`).join(',');
       }
 
       const profilePayload: CreateUserProfileData = {
@@ -84,46 +104,58 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
 
       const profile = await createUserProfile(profilePayload);
 
-      // If user uploaded a file but did NOT accept privacy policy, skip extraction
-      if (uploadedFile && !acceptedPrivacy) {
-        setInfo('You uploaded a company policy, but you did not accept the privacy policy. Extraction was skipped. If you want automatic extraction, re-upload the file and accept the privacy notice.');
-        // We still created the profile above; continue to completion.
+      if (uploadedFiles.length > 0 && !acceptedPrivacy) {
+        setInfo('You uploaded leave policies, but you did not accept the privacy policy. Extraction was skipped.');
         onComplete(profile.id);
         return;
       }
 
-      // If uploadedFile exists and user accepted privacy, proceed to extract and save policies
-      if (uploadedFile && acceptedPrivacy) {
+      if (uploadedFiles.length > 0 && acceptedPrivacy) {
         try {
           setIsExtractingPDF(true);
-          console.log('[OnboardingForm] Starting PDF extraction...');
-          const extractedPolicies = await extractPoliciesFromPDF(uploadedFile);
-          console.log(`[OnboardingForm] Successfully extracted ${extractedPolicies.length} policies`);
+          console.log('[OnboardingForm] Starting PDF extraction for', uploadedFiles.length, 'files...');
 
-          if (extractedPolicies.length > 0) {
-            console.log('[OnboardingForm] Deleting user-specific policies and saving new ones...');
-            await deleteUserPolicies(profile.id);
+          await deleteUserPolicies(profile.id);
 
-            const newPolicies = extractedPolicies.map(p => ({
-              title: p.title,
-              category: p.category,
-              text_doc: p.content,
-              source_url: null,
-              user_profile_id: profile.id
-            }));
+          let totalPoliciesSaved = 0;
+          const pdfFiles = uploadedFiles.filter(f => f.type === 'application/pdf');
 
-            console.log('[OnboardingForm] Saving policies with user_profile_id:', profile.id);
-            const savedPolicies = await createMultiplePolicies(newPolicies);
-            console.log('[OnboardingForm] Policies saved successfully:', savedPolicies.length);
-            setInfo(`Extracted and saved ${savedPolicies.length} policy items.`);
+          for (let i = 0; i < pdfFiles.length; i++) {
+            const file = pdfFiles[i];
+            setExtractionProgress(`Processing file ${i + 1} of ${pdfFiles.length}: ${file.name}`);
+
+            try {
+              const extractedPolicies = await extractPoliciesFromPDF(file);
+              console.log(`[OnboardingForm] Extracted ${extractedPolicies.length} policies from ${file.name}`);
+
+              if (extractedPolicies.length > 0) {
+                const newPolicies = extractedPolicies.map(p => ({
+                  title: p.title,
+                  category: p.category,
+                  text_doc: p.content,
+                  source_url: file.name,
+                  user_profile_id: profile.id
+                }));
+
+                const savedPolicies = await createMultiplePolicies(newPolicies);
+                totalPoliciesSaved += savedPolicies.length;
+              }
+            } catch (fileError) {
+              console.error(`[OnboardingForm] Error extracting from ${file.name}:`, fileError);
+            }
+          }
+
+          if (totalPoliciesSaved > 0) {
+            setInfo(`Extracted and saved ${totalPoliciesSaved} policy items from ${pdfFiles.length} file(s).`);
           } else {
-            setInfo('No policy sections were detected in the uploaded document.');
+            setInfo('No policy sections were detected in the uploaded documents.');
           }
         } catch (pdfError) {
-          console.error('[OnboardingForm] Error processing PDF:', pdfError);
-          setError('There was a problem extracting policies from the uploaded file. The profile was still created.');
+          console.error('[OnboardingForm] Error processing PDFs:', pdfError);
+          setError('There was a problem extracting policies. The profile was still created.');
         } finally {
           setIsExtractingPDF(false);
+          setExtractionProgress('');
         }
       }
 
@@ -249,15 +281,16 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
           {/* Upload + Privacy acceptance */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-3">
-              Upload Company Leave Policy <span className="text-slate-500">(optional)</span>
+              Upload your leave policies <span className="text-slate-500">(optional)</span>
             </label>
             <p className="text-xs text-slate-500 mb-2">
-              Upload your company's leave policy PDF to automatically extract and organize policies using AI
+              Upload PDF files containing your leave policies. AI will extract and organize them automatically.
             </p>
             <div className="relative">
               <input
                 type="file"
                 accept=".pdf,.docx"
+                multiple
                 onChange={handleFileChange}
                 className="hidden"
                 id="policy-upload"
@@ -267,16 +300,37 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                 className="flex items-center justify-center gap-3 w-full bg-slate-900 border-2 border-dashed border-slate-700 hover:border-blue-500/50 text-slate-400 hover:text-slate-300 rounded-xl px-4 py-6 cursor-pointer transition-all"
               >
                 <Upload size={20} />
-                {uploadedFile ? (
-                  <span className="text-slate-300">{uploadedFile.name}</span>
-                ) : (
-                  <span>Click to upload PDF or DOCX (max 10MB)</span>
-                )}
+                <span>Click to upload PDF or DOCX files (max 10MB each)</span>
               </label>
             </div>
 
-            {/* Privacy acceptance checkbox - required for extraction */}
-            {uploadedFile && (
+            {uploadedFiles.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {uploadedFiles.map((file, index) => (
+                  <div
+                    key={`${file.name}-${index}`}
+                    className="flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FileText size={16} className="text-blue-400 flex-shrink-0" />
+                      <span className="text-sm text-slate-300 truncate">{file.name}</span>
+                      <span className="text-xs text-slate-500 flex-shrink-0">
+                        ({(file.size / 1024).toFixed(0)} KB)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="p-1 text-slate-400 hover:text-red-400 transition-colors flex-shrink-0"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {uploadedFiles.length > 0 && (
               <div className="mt-3 flex items-start gap-3">
                 <input
                   id="accept-privacy"
@@ -286,7 +340,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                   className="mt-1 accent-blue-500 w-4 h-4 rounded"
                 />
                 <label htmlFor="accept-privacy" className="text-xs text-slate-400">
-                  I consent to upload and allow automatic extraction of my company's policy for the purpose of
+                  I consent to upload and allow automatic extraction of my leave policies for the purpose of
                   identifying leave rules. I understand extracted data will be stored and used only to personalize
                   leave calculations. Read the{' '}
                   <button
@@ -301,10 +355,10 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
               </div>
             )}
 
-            {!import.meta.env.VITE_OPENAI_API_KEY && uploadedFile && (
+            {!import.meta.env.VITE_OPENAI_API_KEY && uploadedFiles.length > 0 && (
               <p className="text-xs text-amber-400 mt-2 flex items-start gap-2">
-                <span className="text-amber-500">⚠</span>
-                <span>OpenAI API key is required for PDF extraction. Your file will be saved but policies won't be extracted automatically.</span>
+                <span className="text-amber-500">!</span>
+                <span>OpenAI API key is required for PDF extraction. Your files will be saved but policies won't be extracted automatically.</span>
               </p>
             )}
           </div>
@@ -322,7 +376,6 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
           )}
 
           <div className="flex gap-4 pt-4">
-            {/* Skip button removed per request - only Save & Start Chatting remains */}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -330,7 +383,9 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
             >
               {isSubmitting ? (
                 isExtractingPDF ? (
-                  <>Extracting policies from PDF...</>
+                  <span className="text-center">
+                    {extractionProgress || 'Extracting policies...'}
+                  </span>
                 ) : (
                   <>Processing...</>
                 )

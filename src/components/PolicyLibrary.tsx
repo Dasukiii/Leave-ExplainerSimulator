@@ -92,9 +92,9 @@ export const PolicyLibrary: React.FC = () => {
   const activePolicyData = policies.find(p => p.id === selectedPolicy);
 
   return (
-    <div className="h-full flex bg-slate-950">
-      <div className={`flex-1 flex flex-col border-r border-slate-800 ${selectedPolicy ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-6 border-b border-slate-800">
+    <div className="h-full flex bg-slate-900">
+      <div className={`flex-1 flex flex-col border-r border-slate-700 ${selectedPolicy ? 'hidden md:flex' : 'flex'}`}>
+        <div className="p-6 border-b border-slate-700">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-white">Policy Library</h2>
             <div>
@@ -131,7 +131,7 @@ export const PolicyLibrary: React.FC = () => {
               placeholder="Search policies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-slate-200 focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full bg-slate-800 border border-slate-600 rounded-xl py-2.5 pl-10 pr-4 text-slate-100 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
         </div>
@@ -143,9 +143,9 @@ export const PolicyLibrary: React.FC = () => {
             </div>
           ) : filteredPolicies.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <FileText size={48} className="text-slate-600 mb-4" />
-              <div className="text-slate-400 mb-2">No policies found</div>
-              <p className="text-sm text-slate-500 max-w-xs">
+              <FileText size={48} className="text-slate-500 mb-4" />
+              <div className="text-slate-300 mb-2">No policies found</div>
+              <p className="text-sm text-slate-400 max-w-xs">
                 Upload a company policy PDF to replace the default policies
               </p>
             </div>
@@ -158,22 +158,22 @@ export const PolicyLibrary: React.FC = () => {
                   className={`p-4 rounded-xl cursor-pointer transition-all ${
                     selectedPolicy === policy.id
                       ? 'bg-blue-600/10 border border-blue-500/50'
-                      : 'bg-slate-900/30 border border-transparent hover:bg-slate-900 hover:border-slate-800'
+                      : 'bg-slate-800/30 border border-transparent hover:bg-slate-800 hover:border-slate-700'
                   }`}
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center">
                         <FileText className="text-blue-400" size={20} />
                       </div>
                       <div>
                         <h3 className={`font-medium ${selectedPolicy === policy.id ? 'text-blue-400' : 'text-slate-200'}`}>
                           {policy.title}
                         </h3>
-                        <p className="text-xs text-slate-500">{policy.category}</p>
+                        <p className="text-xs text-slate-400">{policy.category}</p>
                       </div>
                     </div>
-                    <ChevronRight size={16} className="text-slate-600" />
+                    <ChevronRight size={16} className="text-slate-500" />
                   </div>
                 </div>
               ))}
@@ -182,10 +182,10 @@ export const PolicyLibrary: React.FC = () => {
         </div>
       </div>
 
-      <div className={`flex-[1.5] bg-slate-950/50 flex-col ${selectedPolicy ? 'flex' : 'hidden md:flex'}`}>
+      <div className={`flex-[1.5] bg-slate-900/50 flex-col ${selectedPolicy ? 'flex' : 'hidden md:flex'}`}>
         {activePolicyData ? (
           <>
-            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/20 backdrop-blur-sm">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800/20 backdrop-blur-sm">
               <div>
                 <button
                   onClick={() => setSelectedPolicy(null)}
@@ -213,8 +213,8 @@ export const PolicyLibrary: React.FC = () => {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
-            <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4">
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
               <FileText size={32} className="opacity-50" />
             </div>
             <p>Select a policy to view details</p>

@@ -168,7 +168,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
   };
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 flex items-center justify-center p-6 overflow-y-auto">
+    <div className="min-h-screen w-full bg-slate-900 flex items-center justify-center p-6 overflow-y-auto">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="w-full max-w-3xl relative z-10 py-12">
@@ -190,12 +190,12 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
           <h1 className="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
             Let's personalize your experience
           </h1>
-          <p className="text-slate-400 text-lg">
+          <p className="text-slate-300 text-lg">
             Tell us about yourself and your leave situation
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-3xl p-8 space-y-6 shadow-2xl">
+        <form onSubmit={handleSubmit} className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-3xl p-8 space-y-6 shadow-2xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
@@ -207,7 +207,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="e.g., Acme Corp"
-                className="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-500 transition-all"
+                className="w-full bg-slate-800 border border-slate-600 text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-400 transition-all"
               />
             </div>
 
@@ -221,7 +221,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., John"
-                className="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-500 transition-all"
+                className="w-full bg-slate-800 border border-slate-600 text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-400 transition-all"
               />
             </div>
           </div>
@@ -237,7 +237,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                 value={formData.hire_date}
                 onChange={(e) => setFormData({ ...formData, hire_date: e.target.value })}
                 required
-                className="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                className="w-full bg-slate-800 border border-slate-600 text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
               />
             </div>
 
@@ -249,7 +249,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
               <select
                 value={formData.employment_type}
                 onChange={(e) => setFormData({ ...formData, employment_type: e.target.value })}
-                className="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                className="w-full bg-slate-800 border border-slate-600 text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
               >
                 <option value="Permanent">Permanent</option>
                 <option value="Contract">Contract</option>
@@ -259,7 +259,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-3">Leaves Taken This Year</label>
-            <p className="text-xs text-slate-500 mb-3">Enter the number of days you've already taken this year</p>
+            <p className="text-xs text-slate-400 mb-3">Enter the number of days you've already taken this year</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-slate-400 mb-1">Annual Leave Days Taken</label>
@@ -270,7 +270,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                   value={annualDaysTaken}
                   onChange={(e) => setAnnualDaysTaken(parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-500 transition-all"
+                  className="w-full bg-slate-800 border border-slate-600 text-slate-100 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-400 transition-all"
                 />
               </div>
 
@@ -283,7 +283,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
             <label className="block text-sm font-medium text-slate-300 mb-3">
               Upload your leave policies <span className="text-slate-500">(optional)</span>
             </label>
-            <p className="text-xs text-slate-500 mb-2">
+            <p className="text-xs text-slate-400 mb-2">
               Upload PDF files containing your leave policies. AI will extract and organize them automatically.
             </p>
             <div className="relative">
@@ -297,7 +297,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
               />
               <label
                 htmlFor="policy-upload"
-                className="flex items-center justify-center gap-3 w-full bg-slate-900 border-2 border-dashed border-slate-700 hover:border-blue-500/50 text-slate-400 hover:text-slate-300 rounded-xl px-4 py-6 cursor-pointer transition-all"
+                className="flex items-center justify-center gap-3 w-full bg-slate-800 border-2 border-dashed border-slate-600 hover:border-blue-500/50 text-slate-300 hover:text-slate-200 rounded-xl px-4 py-6 cursor-pointer transition-all"
               >
                 <Upload size={20} />
                 <span>Click to upload PDF or DOCX files (max 10MB each)</span>
@@ -309,12 +309,12 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                 {uploadedFiles.map((file, index) => (
                   <div
                     key={`${file.name}-${index}`}
-                    className="flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2"
+                    className="flex items-center justify-between bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2"
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <FileText size={16} className="text-blue-400 flex-shrink-0" />
                       <span className="text-sm text-slate-300 truncate">{file.name}</span>
-                      <span className="text-xs text-slate-500 flex-shrink-0">
+                      <span className="text-xs text-slate-400 flex-shrink-0">
                         ({(file.size / 1024).toFixed(0)} KB)
                       </span>
                     </div>
@@ -339,7 +339,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
                   onChange={(e) => setAcceptedPrivacy(e.target.checked)}
                   className="mt-1 accent-blue-500 w-4 h-4 rounded"
                 />
-                <label htmlFor="accept-privacy" className="text-xs text-slate-400">
+                <label htmlFor="accept-privacy" className="text-xs text-slate-300">
                   I consent to upload and allow automatic extraction of my leave policies for the purpose of
                   identifying leave rules. I understand extracted data will be stored and used only to personalize
                   leave calculations. Read the{' '}
@@ -370,7 +370,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
           )}
 
           {info && (
-            <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-slate-300 text-sm">
+            <div className="bg-slate-700/60 border border-slate-600 rounded-xl p-4 text-slate-200 text-sm">
               {info}
             </div>
           )}
@@ -399,7 +399,7 @@ export const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete, onPr
           </div>
         </form>
 
-        <p className="text-center text-slate-500 text-sm mt-6">
+        <p className="text-center text-slate-400 text-sm mt-6">
           Your information is stored securely and used only to personalize leave calculations
         </p>
       </div>

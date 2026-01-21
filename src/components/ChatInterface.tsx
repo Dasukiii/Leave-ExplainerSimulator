@@ -145,19 +145,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
 
   if (isLoadingSession) {
     return (
-      <div className="h-full flex items-center justify-center bg-slate-950">
+      <div className="h-full flex items-center justify-center bg-slate-900">
         <div className="text-slate-400">Loading chat session...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col relative overflow-hidden bg-slate-950">
+    <div className="h-full flex flex-col relative overflow-hidden bg-slate-900">
       {messages.length > 0 && (
         <div className="absolute top-4 right-6 z-30 flex gap-2">
           <button
             onClick={exportToPDF}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded-lg transition-all shadow-lg"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 rounded-lg transition-all shadow-lg"
             aria-label="Export chat"
             title="Export chat"
           >
@@ -186,7 +186,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
           <div className="h-full flex flex-col items-center justify-center text-center space-y-8 z-10 relative">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full blur opacity-40 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative w-24 h-24 bg-slate-900 rounded-full flex items-center justify-center border border-slate-700 shadow-2xl">
+              <div className="relative w-24 h-24 bg-slate-800 rounded-full flex items-center justify-center border border-slate-600 shadow-2xl">
                 <Sparkles className="text-blue-400 w-10 h-10" />
               </div>
             </div>
@@ -195,7 +195,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
               <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
                 Hi {user.name.split(' ')[0]}!
               </h2>
-              <p className="text-slate-400 text-lg">
+              <p className="text-slate-300 text-lg">
                 Ask me anything about leave policies or run a simulation.
               </p>
             </div>
@@ -208,7 +208,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
                     setInput(suggestion);
                     // Optional: auto-send
                   }}
-                  className="p-4 bg-slate-900/50 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/50 rounded-xl text-left transition-all duration-300 group"
+                  className="p-4 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 rounded-xl text-left transition-all duration-300 group"
                 >
                   <span className="text-slate-300 group-hover:text-white text-sm">{suggestion}</span>
                 </button>
@@ -232,7 +232,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
                   className={`max-w-[80%] rounded-2xl p-4 shadow-sm ${
                     msg.role === 'user'
                       ? 'bg-blue-600 text-white rounded-br-none'
-                      : 'bg-slate-900/80 border border-slate-800 text-slate-200 rounded-tl-none backdrop-blur-sm'
+                      : 'bg-slate-800/80 border border-slate-700 text-slate-100 rounded-tl-none backdrop-blur-sm'
                   }`}
                 >
                   {msg.role === 'model' ? (
@@ -256,7 +256,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shrink-0">
                     <RefreshCw size={16} className="text-white animate-spin" />
                   </div>
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl rounded-tl-none p-4 flex items-center gap-2">
+                  <div className="bg-slate-800/80 border border-slate-700 rounded-2xl rounded-tl-none p-4 flex items-center gap-2">
                     <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></span>
                     <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-75"></span>
                     <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150"></span>
@@ -268,7 +268,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
         )}
       </div>
 
-      <div className="p-6 bg-slate-950 border-t border-slate-800/50 relative z-20">
+      <div className="p-6 bg-slate-900 border-t border-slate-700/50 relative z-20">
         <div className="max-w-4xl mx-auto relative">
           <input
             type="text"
@@ -276,7 +276,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type your question here..."
-            className="w-full bg-slate-900/50 border border-slate-800 text-slate-200 rounded-2xl pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-500 transition-all shadow-lg"
+            className="w-full bg-slate-800/50 border border-slate-700 text-slate-100 rounded-2xl pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 placeholder-slate-400 transition-all shadow-lg"
           />
           <button
             onClick={handleSend}
@@ -286,7 +286,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
             <Send size={20} />
           </button>
         </div>
-        <div className="text-center mt-3 text-xs text-slate-600">
+        <div className="text-center mt-3 text-xs text-slate-500">
           AI responses may vary. Check official policy documents for binding rules.
         </div>
       </div>

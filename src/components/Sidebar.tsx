@@ -127,27 +127,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
   const COLORS = ['#334155', '#10b981'];
 
   return (
-    <div className="w-80 h-screen bg-slate-950/50 backdrop-blur-xl border-r border-slate-800 flex flex-col p-4 fixed left-0 top-0 z-20 overflow-y-auto">
+    <div className="w-80 h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-700 flex flex-col p-4 fixed left-0 top-0 z-20 overflow-y-auto">
       <div className="flex items-center gap-3 px-2 mb-6 mt-2">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
           <Sparkles className="text-white" size={20} />
         </div>
         <div>
           <h1 className="text-lg font-bold text-white tracking-tight">LeaveExplainer AI</h1>
-          <p className="text-xs text-slate-500">Your Personal Leave Assistant</p>
+          <p className="text-xs text-slate-400">Your Personal Leave Assistant</p>
         </div>
       </div>
 
       <div className="space-y-2 mb-6">
-        <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider px-3 mb-2">Menu</div>
+        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-2">Menu</div>
         <NavItem view={AppView.CHAT} icon={MessageSquare} label="AI Assistant" />
         <NavItem view={AppView.POLICIES} icon={BookOpen} label="Policy Library" />
       </div>
 
       <div className="space-y-4 flex-1 mb-4">
-        <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider px-3">Profile</div>
+        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3">Profile</div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 backdrop-blur-sm">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
           {isEditing ? (
             <div className="space-y-3">
               <div>
@@ -156,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 />
               </div>
 
@@ -166,7 +166,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
                   type="date"
                   value={editForm.hire_date}
                   onChange={(e) => setEditForm({ ...editForm, hire_date: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 />
               </div>
 
@@ -175,7 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
                 <select
                   value={editForm.employment_type}
                   onChange={(e) => setEditForm({ ...editForm, employment_type: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 >
                   <option value="Permanent">Permanent</option>
                   <option value="Contract">Contract</option>
@@ -189,7 +189,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
                   min="0"
                   value={editForm.annual_balance}
                   onChange={(e) => setEditForm({ ...editForm, annual_balance: parseInt(e.target.value) || 0 })}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full bg-slate-700 border border-slate-600 text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 />
               </div>
 
@@ -203,7 +203,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
                 </button>
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm hover:bg-slate-700 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-700 text-slate-200 rounded-lg text-sm hover:bg-slate-600 transition-colors"
                 >
                   <X size={14} />
                   Cancel
@@ -214,7 +214,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">Hire Date</p>
+                  <p className="text-slate-400 text-xs uppercase tracking-wide mb-1">Hire Date</p>
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 text-slate-400" />
                     <span className="text-slate-200 text-xs font-medium">
@@ -224,7 +224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
                 </div>
 
                 <div>
-                  <p className="text-slate-500 text-xs uppercase tracking-wide mb-1">Tenure</p>
+                  <p className="text-slate-400 text-xs uppercase tracking-wide mb-1">Tenure</p>
                   <div className="flex items-center gap-1">
                     <Award className="w-3 h-3 text-slate-400" />
                     <span className="text-slate-200 text-xs font-medium">{tenure} Years</span>
@@ -243,12 +243,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
           )}
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 backdrop-blur-sm">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <h4 className="text-slate-400 text-xs font-medium">Annual Leave</h4>
+              <h4 className="text-slate-300 text-xs font-medium">Annual Leave</h4>
               <h3 className="text-2xl font-bold text-white mt-1">
-                {annualLeaveRemaining} <span className="text-xs text-slate-500 font-normal">days</span>
+                {annualLeaveRemaining} <span className="text-xs text-slate-400 font-normal">days</span>
               </h3>
             </div>
             <div className="h-8 w-8 bg-green-500/10 rounded-full flex items-center justify-center">
@@ -281,16 +281,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
             </ResponsiveContainer>
           </div>
 
-          <div className="flex justify-between text-xs text-slate-500 -mt-4 px-4">
+          <div className="flex justify-between text-xs text-slate-400 -mt-4 px-4">
             <span>Used ({annualLeaveUsed})</span>
             <span>Total ({annualLeaveTotal})</span>
           </div>
         </div>
       </div>
 
-      <div className="mt-auto pt-4 border-t border-slate-800">
-        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-900/50 transition-colors">
-          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300">
+      <div className="mt-auto pt-4 border-t border-slate-700">
+        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition-colors">
+          <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-slate-200">
             {user?.name ? (
               <span className="text-sm font-semibold">{user.name.charAt(0).toUpperCase()}</span>
             ) : (
@@ -298,13 +298,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, use
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-300 truncate">{user?.name || 'User'}</p>
-            <p className="text-xs text-slate-500 truncate">{user?.role || 'Employee'}</p>
+            <p className="text-sm font-medium text-slate-200 truncate">{user?.name || 'User'}</p>
+            <p className="text-xs text-slate-400 truncate">{user?.role || 'Employee'}</p>
           </div>
           {onLogout && (
             <button
               onClick={handleLogoutClick}
-              className="text-slate-500 hover:text-red-400 transition-colors"
+              className="text-slate-400 hover:text-red-400 transition-colors"
               title="Logout"
             >
               <LogOut size={16} />

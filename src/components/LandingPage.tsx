@@ -37,7 +37,7 @@ export default function LandingPage({ onGetStarted, onAutoLogin, onPrivacyClick 
   };
 
   return (
-    <div className="w-screen min-h-screen bg-slate-950 flex flex-col relative overflow-auto">
+    <div className="w-screen min-h-screen bg-slate-900 flex flex-col relative overflow-auto">
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px]" />
@@ -52,7 +52,7 @@ export default function LandingPage({ onGetStarted, onAutoLogin, onPrivacyClick 
             </span>
           </h1>
 
-          <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
             No HR waiting. Get instant policy citations, check personalized eligibility, and simulate your leave balances in seconds.
           </p>
 
@@ -84,11 +84,11 @@ export default function LandingPage({ onGetStarted, onAutoLogin, onPrivacyClick 
               return (
                 <div
                   key={idx}
-                  className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 backdrop-blur-sm hover:bg-slate-900/60 transition-colors"
+                  className="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-colors"
                 >
                   <Icon className="text-blue-400 mb-4" size={28} />
                   <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
-                  <p className="text-slate-400 text-sm">{feature.desc}</p>
+                  <p className="text-slate-300 text-sm">{feature.desc}</p>
                 </div>
               );
             })}
@@ -96,10 +96,10 @@ export default function LandingPage({ onGetStarted, onAutoLogin, onPrivacyClick 
         </div>
       </div>
 
-      <footer className="relative z-10 border-t border-slate-800/50 bg-slate-950/80 backdrop-blur-sm">
+      <footer className="relative z-10 border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-6 py-6">
           <div className="flex items-center justify-center gap-2 text-sm">
-            <span className="text-slate-500">Copyright © 2026</span>
+            <span className="text-slate-400">Copyright © 2026</span>
             <span
               className="inline-flex items-center justify-center rounded-sm p-1"
               style={{
@@ -112,8 +112,8 @@ export default function LandingPage({ onGetStarted, onAutoLogin, onPrivacyClick 
                 className="w-20 h-6 object-contain rounded-sm"
               />
             </span>
-            <span className="text-slate-500">All rights reserved.</span>
-            <span className="text-slate-600 mx-2">|</span>
+            <span className="text-slate-400">All rights reserved.</span>
+            <span className="text-slate-500 mx-2">|</span>
             <button
               onClick={onPrivacyClick}
               className="text-slate-400 hover:text-blue-400 transition-colors"
